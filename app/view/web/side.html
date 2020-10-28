@@ -7,10 +7,11 @@
 		height:100%;
 		padding-top:20px;
 		background:#fff;
+		z-index:101;
 		border-right:solid 1px #f1f1f1;
 	}
 	.com_side .list{
-		overflow:hidden;
+		overflow-y: auto;
 	}
 	.com_side .item{
 		width:100%;
@@ -47,12 +48,21 @@
 	.com_side .active:after{
 		display:block;
 	}
+	@media (max-width: 768px) {
+		.com_side{
+			display:none;
+    	}
+	}
 </style>
 <div class="com_side">
 	<div class="list" id="side-main-nav">
 		<a href="/web/home"><li class="item" data-mark="home">
 			<span class="iconfont">&#xe625;</span>
 			<span class="title">数据分析</span>
+		</li></a>
+		<a href="/web/top"><li class="item" data-mark="top">
+				<span class="iconfont">&#xe608;</span>
+				<span class="title">TOP分析</span>
 		</li></a>
 		<a href="/web/pagesavg"><li class="item" data-mark="pages">
 			<span class="iconfont">&#xe6ea;</span>
@@ -73,6 +83,18 @@
 		<a href="/web/resourcesavg"><li class="item" data-mark="resources">
 			<span class="iconfont">&#xe677;</span>
 			<span class="title">慢资源追踪</span>
+		</li></a>
+		<a href="/web/analysislist"><li class="item" data-mark="analysis">
+				<span class="iconfont">&#xe65d;</span>
+				<span class="title">用户轨迹</span>
+		</li></a>
+		<a href="/web/diagram"><li class="item" data-mark="diagram">
+				<span class="iconfont">&#xe79c;</span>
+				<span class="title">流量热力图</span>
+		</li></a>
+		<a href="/web/alarm"><li class="item" data-mark="alarm">
+				<span class="iconfont">&#xe626;</span>
+				<span class="title">应用告警</span>
 		</li></a>
 		<a href="/web/setting"><li class="item" data-mark="setting">
 			<span class="iconfont">&#xe660;</span>

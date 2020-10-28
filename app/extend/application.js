@@ -1,5 +1,4 @@
 'use strict';
-
 const { exec } = require('child_process');
 const md5 = require('md5');
 
@@ -12,14 +11,14 @@ module.exports = {
     },
     /* 生成随机字符串 */
     randomString(len) {
-        len = len || 32;
+        len = len || 7;
         const $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
         const maxPos = $chars.length;
         let pwd = '';
         for (let i = 0; i < len; i++) {
             pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
         }
-        return pwd;
+        return pwd + Date.now();
     },
 
     /* 本地加密算法 */
@@ -76,16 +75,54 @@ module.exports = {
         }
         return fmt;
     },
+    // 流量数字格式化
+    flow(val = 0) {
+        let value = val;
+        let index = 0;
+        while (value >= 1024) {
+            value = value / 1024;
+            index++;
+        }
+        value = value.toFixed(2);
+        if (index >= 4) {
+            value = value + 'T';
+        } else if (index >= 3) {
+            value = value + 'G';
+        } else if (index >= 2) {
+            value = value + 'M';
+        } else if (index >= 1) {
+            value = value + 'KB';
+        } else {
+            value = value + 'B';
+        }
+        return value;
+    },
     // 重启mongodb服务器
-    restartMongodbs() {
-        console.log(this.config.mongodb_restart_sh)
-        if (!this.config.mongodb_restart_sh && !this.config.mongodb_restart_sh.length) return;
-        this.config.mongodb_restart_sh.forEach(item => {
-            exec(`sh ${item}`, error => {
-                if (error) { console.log('重启mongodb数据库失败!'); return; }
-                console.log('重启mongodb数据库成功!');
+    restartMongodbs(type, ctx, catcherr) {
+        if (this.config.shell_restart.mongodb && this.config.shell_restart.mongodb.length) {
+            this.config.shell_restart.mongodb.forEach(item => {
+                exec(`sh ${item}`, error => {
+                    if (error) {
+                        this.logger.info(`重启${type}数据库失败!`);
+                        return;
+                    }
+                    this.logger.info(`重启${type}数据库成功!`);
+                    ctx.service.errors.saveSysAndDbErrors(type, item, catcherr);
+                    // 重启servers
+                    if (this.config.shell_restart.servers && this.config.shell_restart.servers.length) {
+                        this.config.shell_restart.servers.forEach(item => {
+                            exec(`sh ${item}`, error => {
+                                if (error) {
+                                    this.logger.info('重启node.js服务失败!');
+                                    return;
+                                }
+                                this.logger.info('重启node.js服务成功!');
+                            });
+                        });
+                    }
+                });
             });
-        });
+        }
     },
 };
 

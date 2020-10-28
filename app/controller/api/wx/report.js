@@ -2,96 +2,53 @@
 
 const Controller = require('egg').Controller;
 
-class AjaxsController extends Controller {
+class ReportController extends Controller {
 
-    // 平均页面性能列表
-    async getPageAjaxsAvg() {
+    // 微信端用户数据上报
+    async wxReport() {
         const { ctx } = this;
-        const query = ctx.request.query;
-        const appId = query.appId;
-        const url = query.url;
+        ctx.set('Access-Control-Allow-Origin', '*');
+        ctx.set('Content-Type', 'application/json;charset=UTF-8');
+        ctx.set('X-Response-Time', '2s');
+        ctx.set('Connection', 'close');
+        ctx.status = 200;
 
-        if (!appId) throw new Error('页面ajax信息：appId不能为空');
-        if (!url) throw new Error('页面ajax信息：url不能为空');
+        const query = ctx.request.body;
+        if (!query.appId) throw new Error('wx端上报数据操作：app_id不能为空');
 
-        const result = await ctx.service.web.webAjaxs.getPageAjaxsAvg(appId, url);
+        query.ip = ctx.get('X-Real-IP') || ctx.get('X-Forwarded-For') || ctx.ip;
 
-        ctx.body = this.app.result({
-            data: result,
-        });
+        if (this.app.config.report_data_type === 'redis') this.saveWxReportDataForRedis(query);
+        if (this.app.config.report_data_type === 'kafka') this.saveWxReportDataForKafka(query);
+        if (this.app.config.report_data_type === 'mongodb') this.saveWxReportDataForMongodb(ctx);
     }
 
-    // 平均AJAX性能列表
-    async getAverageAjaxList() {
-        const { ctx } = this;
-        const query = ctx.request.query;
-        const appId = query.appId;
-
-        if (!appId) throw new Error('平均AJAX性能列表：appId不能为空');
-
-        const result = await ctx.service.web.webAjaxs.getAverageAjaxList(ctx);
-
-        ctx.body = this.app.result({
-            data: result,
-        });
-    }
-    // 获得单个api的平均性能数据
-    async getOneAjaxAvg() {
-        const { ctx } = this;
-        const query = ctx.request.query;
-        const appId = query.appId;
-        const url = query.url;
-        const beginTime = query.beginTime;
-        const endTime = query.endTime;
-        const type = query.type;
-
-        if (!appId) throw new Error('单个AJAX平均性能数据：appId不能为空');
-        if (!url) throw new Error('单个AJAX平均性能数据：api地址不能为空');
-
-        const result = await ctx.service.web.webAjaxs.getOneAjaxAvg(appId, url, beginTime, endTime, type);
-
-        ctx.body = this.app.result({
-            data: result,
-        });
-    }
-    // 获得单个api的性能列表数据
-    async getOneAjaxList() {
-        const { ctx } = this;
-        const query = ctx.request.query;
-        const appId = query.appId;
-        const url = query.url;
-        const pageNo = query.pageNo || 1;
-        const pageSize = query.pageSize || this.app.config.pageSize;
-        const beginTime = query.beginTime;
-        const endTime = query.endTime;
-        const type = query.type;
-
-        if (!appId) throw new Error('单个AJAX平均性能数据：appId不能为空');
-        if (!url) throw new Error('单个AJAX平均性能数据：api地址不能为空');
-
-        const result = await ctx.service.web.webAjaxs.getOneAjaxList(appId, url, pageNo, pageSize, beginTime, endTime, type);
-
-        ctx.body = this.app.result({
-            data: result,
-        });
+    // 通过redis 消费者模式存储数据
+    async saveWxReportDataForRedis(query) {
+        try {
+            if (this.app.config.redis_consumption.total_limit_wx) {
+                // 限流
+                const length = await this.app.redis.llen('wx_repore_datas');
+                if (length >= this.app.config.redis_consumption.total_limit_wx) return;
+            }
+            this.app.redis.lpush('wx_repore_datas', JSON.stringify(query));
+        } catch (e) { console.log(e); }
     }
 
-    // 获得单个ajax详情信息
-    async getOneAjaxDetail() {
-        const { ctx } = this;
-        const query = ctx.request.query;
-        const appId = query.appId;
-        const markPage = query.markPage;
-
-        if (!appId) throw new Error('获得单个ajax详情信息：appId不能为空');
-        if (!markPage) throw new Error('获得单个ajax详情信息：markPage不能为空');
-
-        const result = await ctx.service.web.webAjaxs.getOneAjaxDetail(appId, markPage);
-
-        ctx.body = this.app.result({
-            data: result,
-        });
+    // 通过kafka 消息队列消费数据
+    async saveWxReportDataForKafka(query) {
+        // 生产者
+        this.app.kafka.send(
+            'wx',
+            JSON.stringify(query)
+        );
     }
+
+    // 通过mongodb 数据库存储数据
+    async saveWxReportDataForMongodb(ctx) {
+        ctx.service.wx.report.saveWxReportData(ctx);
+    }
+
 }
 
-module.exports = AjaxsController;
+module.exports = ReportController;

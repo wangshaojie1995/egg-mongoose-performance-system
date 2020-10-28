@@ -11,16 +11,24 @@ module.exports = app => {
         create_time: { type: Date, default: Date.now }, // 创建时间
         mark_page: { type: String }, // 所有资源页面统一标识
         mark_user: { type: String }, // 统一某一时间段用户标识
-        col: { type: String }, // 错误行
-        line: { type: String }, // 错误列
+        col: { type: Number }, // 错误行
+        line: { type: Number }, // 错误列
         name: { type: String }, // 错误资源名称
         msg: { type: String }, // 错误信息
         type: { type: String }, // 错误类型
         method: { type: String }, // ajax请求方式
         status: { type: String }, // ajax请求返回状态
         options: { type: Mixed }, // ajax请求参数
+        path: { type: String }, // 所属path路径
+    }, {
+        shardKey: { _id: 'hashed' },
     });
 
-    WxErrorsSchema.index({ create_time: 1 });
-    return conn.model('WxErrors', WxErrorsSchema);
+    WxErrorsSchema.index({ type: 1, name: 1, create_time: 1 });
+    WxErrorsSchema.index({ type: 1, path: 1, create_time: 1 });
+    WxErrorsSchema.index({ name: 1, create_time: -1 });
+
+    app.models.WxErrors = function(appId) {
+        return conn.model(`wx_errors_${appId}`, WxErrorsSchema);
+    };
 };

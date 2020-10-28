@@ -13,6 +13,7 @@ module.exports = app => {
         options: { type: Mixed }, // 路径参数
         mark_page: { type: String }, // 所有资源页面统一标识
         mark_user: { type: String }, // 统一某一时间段用户标识
+        mark_uv: { type: String }, // 统一uv标识
         net: { type: String }, // 网络类型
         ip: { type: String }, // 用户ip
         county: { type: String }, // 国家
@@ -27,8 +28,16 @@ module.exports = app => {
         system: { type: String }, // 操作系统版本
         platform: { type: String }, // 客户端平台
         SDKVersion: { type: String }, // 客户端基础库版本
+    }, {
+        shardKey: { _id: 'hashed' },
     });
 
-    WxPagesSchema.index({ create_time: 1 });
-    return conn.model('WxPaths', WxPagesSchema);
+    WxPagesSchema.index({ path: 1, create_time: -1 });
+    WxPagesSchema.index({ create_time: -1 });
+    WxPagesSchema.index({ mark_page: -1 });
+    WxPagesSchema.index({ mark_user: -1 });
+
+    app.models.WxPages = function(appId) {
+        return conn.model(`wx_pages_${appId}`, WxPagesSchema);
+    };
 };

@@ -1,7 +1,5 @@
 'use strict';
-
-// had enabled by egg
-// exports.static = true;
+const path = require('path');
 
 exports.ejs = {
     enable: true,
@@ -27,3 +25,19 @@ exports.cors = {
     enable: true,
     package: 'egg-cors',
 };
+
+exports.email = {
+    enable: true,
+    path: path.join(__dirname, '../lib/plugin/egg-email'),
+};
+
+exports.kafka = {
+    enable: true,
+    path: path.join(__dirname, '../lib/plugin/egg-kafka'),
+};
+
+exports.alinode = {
+    enable: false,
+    package: 'egg-alinode',
+};
+

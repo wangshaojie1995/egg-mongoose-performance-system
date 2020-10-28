@@ -12,7 +12,7 @@ class PagesController extends Controller {
 
         if (!appId) throw new Error('平均页面性能列表：appId不能为空');
 
-        const result = await ctx.service.web.webPages.getAveragePageList(ctx);
+        const result = await ctx.service.web.pages.getAveragePageList(ctx);
 
         ctx.body = this.app.result({
             data: result,
@@ -28,7 +28,7 @@ class PagesController extends Controller {
         if (!appId) throw new Error('单个页面性能列表：appId不能为空');
         if (!url) throw new Error('单个页面性能列表：url不能为空');
 
-        const result = await ctx.service.web.webPages.getOnePageList(ctx);
+        const result = await ctx.service.web.pages.getOnePageList(ctx);
 
         ctx.body = this.app.result({
             data: result,
@@ -48,7 +48,7 @@ class PagesController extends Controller {
         if (!appId) throw new Error('单个页面性能列表：appId不能为空');
         if (!url) throw new Error('单个页面性能列表：url不能为空');
 
-        const result = await ctx.service.web.webPages.getPagesForType(appId, url, speedType, pageNo, pageSize);
+        const result = await ctx.service.web.pages.getPagesForType(appId, url, speedType, pageNo, pageSize);
 
         ctx.body = this.app.result({
             data: result,
@@ -59,13 +59,13 @@ class PagesController extends Controller {
     async getPageDetails() {
         const { ctx } = this;
         const query = ctx.request.query;
-        const appId = query.appId;
         const id = query.id;
+        const appId = query.appId;
 
-        if (!appId) throw new Error('单个页面详情：appId不能为空');
         if (!id) throw new Error('单个页面详情：id不能为空');
+        if (!appId) throw new Error('单个页面详情：appId不能为空');
 
-        const result = await ctx.service.web.webPages.getPageDetails(appId, id);
+        const result = await ctx.service.web.pages.getPageDetails(appId, id);
 
         ctx.body = this.app.result({
             data: result,

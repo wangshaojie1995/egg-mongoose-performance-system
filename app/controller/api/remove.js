@@ -2,13 +2,14 @@
 
 const Controller = require('egg').Controller;
 
-class AjaxsController extends Controller {
+class RemoveController extends Controller {
 
     // 清空db1 1日之前无用数据
     async deleteDb1WebData() {
         const { ctx } = this;
+        const query = ctx.request.body;
 
-        const result = await ctx.service.remove.deleteDb1WebData();
+        const result = await ctx.service.remove.deleteDb1WebData(query.type);
         ctx.body = this.app.result({
             data: result,
         });
@@ -19,8 +20,11 @@ class AjaxsController extends Controller {
         const { ctx } = this;
         const query = ctx.request.body;
         const number = query.number || 10;
+        const appId = query.appId;
 
-        const result = await ctx.service.remove.deleteDb2WebData(number);
+        if (!appId) throw new Error('获得error分类列表：appId不能为空');
+
+        const result = await ctx.service.remove.deleteDb2WebData(appId, number, query.type);
         ctx.body = this.app.result({
             data: result,
         });
@@ -28,4 +32,4 @@ class AjaxsController extends Controller {
 
 }
 
-module.exports = AjaxsController;
+module.exports = RemoveController;

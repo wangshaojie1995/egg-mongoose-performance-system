@@ -48,32 +48,34 @@
 			</div>
 			<div class="tipscolor mt10" v-if="errText">{{errText}}</div>
 		</div>
-		<!-- table列表 -->
-		<table class="table" v-if="isLoadend&&listdata.length">
-			<tr class="light_color">
-				<th class="w-300">API地址</th>
-				<th>调用次数</th>
-				<th>请求方式</th>
-				<th>响应时间</th>
-				<th>body数据大小</th>
-				<th>操作</th>
-			</tr>
-			<tr v-for="item in listdata">
-				<td><a href="javascript:" @click="goToList(item)">{{item._id.url}}</a></td>
-				<td class="tc" >{{item.count}}</td>
-				<td class="tc">{{item._id.method}}</td>
-				<td class="red tc">{{item.duration|toFixed}}</td>
-				<td class="tc">{{item.body_size|toSize}}</td>
-				<td class="tc"><a href="javascript:" @click="goToList(item)">详情</a></td>
-			</tr>
-		</table>
+		<div class="overflow_table">
+			<!-- table列表 -->
+			<table class="table" v-if="isLoadend&&listdata.length">
+				<tr class="light_color">
+					<th class="w-300">API地址</th>
+					<th>调用次数</th>
+					<th>请求方式</th>
+					<th>响应时间</th>
+					<th>body数据大小</th>
+					<th>操作</th>
+				</tr>
+				<tr v-for="item in listdata">
+					<td><a class="word-wrap" href="javascript:" @click="goToList(item)">{{item._id.url}}</a></td>
+					<td class="tc" >{{item.count}}</td>
+					<td class="tc">{{item._id.method}}</td>
+					<td class="red tc">{{item.duration|toFixed}}</td>
+					<td class="tc">{{item.body_size|toSize}}</td>
+					<td class="tc"><a href="javascript:" @click="goToList(item)">详情</a></td>
+				</tr>
+			</table>
+		</div>
 	</div>
 	<!--  分页 -->
 	<div class="tc common_page_style mt10" v-show="isLoadend&&listdata.length">
 		<div id="copot-page" class="copot-page"></div>
 	</div>
 	<!-- 暂无数据 -->
-	<div class="tc" v-if="!listdata.length">暂无数据!</div>
+	<div class="tc mt20" v-if="!listdata.length">暂无数据!</div>
 </div>
 
 <script>
@@ -120,7 +122,7 @@
 				this.isLoadend = false;
 				util.ajax({
 					type:'get',
-					url: config.baseApi + 'api/v1/ajax/getAverageAjaxList',
+					url: config.baseApi + 'api/v1/wx/ajax/getAverageAjaxList',
 					data: {
 						type:this.type,
 						appId:this.appId,
@@ -175,7 +177,7 @@
 				});
 			},
 			goToList(item) {
-				location.href = "/web/ajaxdetail?url="+ encodeURIComponent(item._id.url)+'&type='+this.type;
+				location.href = "/wx/ajaxdetail?url="+ encodeURIComponent(item._id.url)+'&type='+this.type;
 			}
 		}
 	})

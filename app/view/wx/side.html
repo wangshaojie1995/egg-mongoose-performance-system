@@ -7,10 +7,11 @@
 		height:100%;
 		padding-top:20px;
 		background:#fff;
+		z-index:101;
 		border-right:solid 1px #f1f1f1;
 	}
 	.com_side .list{
-		overflow:hidden;
+		overflow-y: auto;
 	}
 	.com_side .item{
 		width:100%;
@@ -47,34 +48,43 @@
 	.com_side .active:after{
 		display:block;
 	}
+	@media (max-width: 768px) {
+		.com_side{
+			display:none;
+    	}
+	}
 </style>
 <div class="com_side">
 	<div class="list" id="side-main-nav">
-		<a href="/web/home"><li class="item" data-mark="home">
+		<a href="/wx/home"><li class="item" data-mark="home">
 			<span class="iconfont">&#xe625;</span>
 			<span class="title">数据分析</span>
 		</li></a>
-		<a href="/web/pagesavg"><li class="item" data-mark="pages">
+		<a href="/wx/top"><li class="item" data-mark="top">
+				<span class="iconfont">&#xe608;</span>
+				<span class="title">TOP分析</span>
+		</li></a>
+		<a href="/wx/pagesavg"><li class="item" data-mark="pages">
 			<span class="iconfont">&#xe6ea;</span>
 			<span class="title">访问页面</span>
 		</li></a>
-		<a href="/web/ajaxavg"><li class="item" data-mark="ajax">
+		<a href="/wx/ajaxavg"><li class="item" data-mark="ajax">
 			<span class="iconfont">&#xe653;</span>
 			<span class="title">AJAX性能</span>
 		</li></a>
-		<a href="/web/erroravg"><li class="item" data-mark="error">
+		<a href="/wx/erroravg"><li class="item" data-mark="error">
 			<span class="iconfont">&#xe627;</span>
 			<span class="title">脚本错误</span>
 		</li></a>
-		<a href="/web/pagesavg?type=2&slowpages"><li class="item" data-mark="slowpages">
-			<span class="iconfont">&#xe744;</span>
-			<span class="title">慢页面追踪</span>
+		<a href="/wx/analysislist"><li class="item" data-mark="analysis">
+			<span class="iconfont">&#xe65d;</span>
+			<span class="title">用户轨迹</span>
 		</li></a>
-		<a href="/web/resourcesavg"><li class="item" data-mark="resources">
-			<span class="iconfont">&#xe677;</span>
-			<span class="title">慢资源追踪</span>
+		<a href="/wx/diagram"><li class="item" data-mark="diagram">
+			<span class="iconfont">&#xe79c;</span>
+			<span class="title">流量热力图</span>
 		</li></a>
-		<a href="/web/setting"><li class="item" data-mark="setting">
+		<a href="/wx/setting"><li class="item" data-mark="setting">
 			<span class="iconfont">&#xe660;</span>
 			<span class="title">系统设置</span>
 		</li></a>

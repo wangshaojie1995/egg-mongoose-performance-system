@@ -23,9 +23,15 @@ module.exports = app => {
         fullurl: { type: String }, // 完整url
         mark_page: { type: String }, // 所有资源页面统一标识 html img css js 用户系统信息等
         mark_user: { type: String }, // 统一某一时间段用户标识
+    }, {
+        shardKey: { _id: 'hashed' },
     });
 
-    WebErrorsSchema.index({ app_id: -1, category: -1, resource_url: -1 });
+    WebErrorsSchema.index({ category: 1, resource_url: 1, create_time: -1 });
+    WebErrorsSchema.index({ resource_url: 1, create_time: -1 });
+    WebErrorsSchema.index({ create_time: -1 });
 
-    return conn.model('WebErrors', WebErrorsSchema);
+    app.models.WebErrors = function(appId) {
+        return conn.model(`web_errors_${appId}`, WebErrorsSchema);
+    };
 };

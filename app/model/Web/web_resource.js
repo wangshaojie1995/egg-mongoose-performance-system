@@ -21,9 +21,15 @@ module.exports = app => {
         next_hop_protocol: { type: String, default: 'http/1.1' }, // 资源请求类型
         mark_page: { type: String }, // 所有资源页面统一标识 html img css js 用户系统信息等
         mark_user: { type: String }, // 统一某一时间段用户标识
+    }, {
+        shardKey: { _id: 'hashed' },
     });
 
-    WebResourceSchema.index({ app_id: -1, url: -1, speed_type: -1, create_time: -1, name: -1 });
+    WebResourceSchema.index({ speed_type: 1, name: 1, create_time: -1 });
+    WebResourceSchema.index({ name: 1, create_time: -1 });
+    WebResourceSchema.index({ speed_type: 1, url: 1 });
 
-    return conn.model('WebResource', WebResourceSchema);
+    app.models.WebResource = function(appId) {
+        return conn.model(`web_resources_${appId}`, WebResourceSchema);
+    };
 };
